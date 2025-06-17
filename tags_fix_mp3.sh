@@ -37,7 +37,8 @@ for album_dir in "$base_dir"/*/; do
 
     # Применяем регулярку: Исполнитель — Альбом (Год) или Исполнитель - Альбом (Год)
     # if [[ $album_field =~ ^(.+)\ —\ (.+)\ \(((19|20)[0-9]{2})\)$ ]]; then
-    if [[ $album_field =~ ^(.+)[[:space:]]*[-—][[:space:]]*(.+)\ \(((19|20)[0-9]{2})\)$ ]]; then
+    # if [[ $album_field =~ ^(.+)[[:space:]]*[-—][[:space:]]*(.+)\ \(((19|20)[0-9]{2})\)$ ]]; then
+    if [[ $album_field =~ ^(.+)[[:space:]]*[-—][[:space:]]*(.+)\ \(((19|20)[0-9]{2})(,.*)?\)$ ]]; then
       artist="${BASH_REMATCH[1]}"
       album="${BASH_REMATCH[2]}"
       year="${BASH_REMATCH[3]}"
