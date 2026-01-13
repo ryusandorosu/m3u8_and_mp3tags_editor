@@ -2,6 +2,7 @@
 
 # Указываем путь к директории, где находятся файлы .m3u8
 DIRECTORY="/mnt/d/Downloads"
+[[ $1 == pc ]] && DIRECTORY="/mnt/d/Music/[playlists]/phone"
 
 # Проверяем, что директория существует
 if [[ ! -d "$DIRECTORY" ]]; then
@@ -20,18 +21,29 @@ for file in "$DIRECTORY"/*.m3u8; do
   # Создаем временный файл для хранения изменений
   temp_file=$(mktemp)
 
-  # Редактируем файл: удаляем строки и выполняем замены
-  sed -e '/#EXTM3U/d' \
-      -e '/#EXTINF:/d' \
-      -e 's|\\|/|g' \
-      -e 's|D:/Music vk x4/|primary/Music/|g' \
-      -e 's|D:/Music vk x4 ambcl/|primary/Music/Ambient, Classical, Drone/|g' \
-      "$file" > "$temp_file"
+  if [[ $1 == pc ]]; then
+    sed \
+        -e 's|primary/Music/|D:/Music/|g' \
+        -e 's|/|\\|g' \
+        "$file" > "$temp_file"
+    mv "$temp_file" "/mnt/d/Music/[playlists]/PC/$(basename "$file")"
+    echo "Processed: $file"
+  else
+    # Редактируем файл: удаляем строки и выполняем замены
+    sed \
+        -e '/#EXTM3U/d' \
+        -e '/#EXTINF:/d' \
+        -e '/#EXT-X-RATING:0/d' \
+        -e 's|\\|/|g' \
+        -e 's|D:/Music/|primary/Music/|g' \
+        -e 's|D:/Music vk x4/|primary/Music/|g' \
+        -e 's|D:/Music vk x4 ambcl/|primary/Music/Ambient, Classical, Drone/|g' \
+        "$file" > "$temp_file"
 
-  # Перемещаем временный файл на место оригинального
-  mv "$temp_file" "$file"
-  
-  echo "Processed: $file"
+    # Перемещаем временный файл на место оригинального
+    mv "$temp_file" "$file"
+    echo "Processed: $file"
+  fi
 done
 
 echo "All .m3u8 files in $DIRECTORY have been updated."
